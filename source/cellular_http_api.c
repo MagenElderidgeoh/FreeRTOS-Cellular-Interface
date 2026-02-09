@@ -439,7 +439,7 @@ CellularError_t Cellular_CommonHttpInit( CellularHandle_t cellularHandle,
 
                 if( cellularStatus == CELLULAR_SUCCESS )
                 {
-                    /* Configure request timeout: AT+QHTTPCFG="requestheader",<0|1> */
+                    /* Configure custom header support: AT+QHTTPCFG="requestheader",<0|1> */
                     ( void ) snprintf( cmdBuf, sizeof( cmdBuf ),
                                       "AT+QHTTPCFG=\"requestheader\",%u",
                                       pHttpConfig->enableCustomHeader ? 1U : 0U );
@@ -580,24 +580,13 @@ CellularError_t Cellular_CommonHttpRequest( CellularHandle_t cellularHandle,
         }
         else
         {
-            /* Step 2: Send custom headers if any. */
-            if( pHttpContext->customHeaderCount > 0U )
-            {
-                uint8_t i;
-
-                for( i = 0; i < pHttpContext->customHeaderCount; i++ )
-                {
-                    ( void ) snprintf( cmdBuf, sizeof( cmdBuf ),
-                                      "AT+QHTTPPOST=%u,%u,%u",
-                                      ( uint32_t ) strlen( pHttpContext->customHeaders[ i ] ),
-                                      pHttpContext->config.requestTimeout,
-                                      pHttpContext->config.responseTimeout );
-
-                    /* This is simplified - actual implementation would need proper header handling. */
-                }
-            }
-
-            /* Step 3: Perform HTTP request based on method. */
+            /* Step 2: Perform HTTP request based on method.
+             * Note: Custom headers configured at initialization with AT+QHTTPCFG="requestheader",1
+             * are automatically applied to requests when enableCustomHeader is true.
+             * The headers set via Cellular_HttpSetHeader are stored in the context
+             * and would need to be sent via AT+QHTTPPOSTFILE or similar vendor-specific commands
+             * in a complete implementation. For simplicity, this implementation relies on
+             * the modem's default header handling. */
             pMethodStr = _getHttpMethodString( pRequest->method );
 
             if( pRequest->method == CELLULAR_HTTP_METHOD_GET )

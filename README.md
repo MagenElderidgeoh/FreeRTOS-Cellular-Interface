@@ -3,6 +3,7 @@
 ## On this page:
 
 - [Introduction](#Introduction)
+- [Features](#Features)
 - [Getting Started](#Getting-Started)
   - [Download the Source Code](#Download-the-Source-Code)
   - [Folder Structure](#Folder-Structure)
@@ -42,6 +43,24 @@ written in compliance of the following code quality criteria:
 is part of the
 [FreeRTOS 202406.00 LTS](https://github.com/FreeRTOS/FreeRTOS-LTS/tree/202406.00-LTS)
 release.**
+
+## Features
+
+The FreeRTOS Cellular Interface provides:
+
+- **Standard Socket APIs**: TCP/UDP socket operations for data communication
+- **Network Management**: PDN context configuration, activation, and status monitoring
+- **Power Management**: PSM (Power Saving Mode) and eDRX (extended Discontinuous Reception) support
+- **Signal and Network Information**: RSSI, network registration, and operator information
+- **HTTP Client Support**: Integrated HTTP/HTTPS client with the following capabilities:
+  - Support for HTTP methods: GET, POST, HEAD, PUT, DELETE
+  - HTTPS with SSL/TLS support
+  - Custom HTTP headers
+  - **Large file download support**: Efficient chunked reading for MB-level files via HTTP GET
+  - Configurable timeouts and buffer sizes
+  - Based on Quectel AT+QHTTP* commands (EC600Z/EC800Z/EG800Z series)
+  
+  See [HTTP Functionality Guide](docs/HTTP_GUIDE.md) for detailed usage examples.
 
 ## Getting Started
 

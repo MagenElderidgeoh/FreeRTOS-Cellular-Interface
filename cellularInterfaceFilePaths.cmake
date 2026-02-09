@@ -23,3 +23,13 @@ set( CELLULAR_PRIVATE_DIRS ${CMAKE_CURRENT_LIST_DIR}/source/include/private )
 # Cellular interface include directory.
 set( CELLULAR_INTERFACE_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/source/interface )
 
+# EG800Z module sources (optional - include only if building with EG800Z support)
+# To enable EG800Z module in your build, add:
+# set( CELLULAR_MODULE_EG800Z ON )
+# before including this file
+if( CELLULAR_MODULE_EG800Z )
+    include( ${CMAKE_CURRENT_LIST_DIR}/modules/eg800z/CMakeLists.txt )
+    list( APPEND CELLULAR_COMMON_SOURCES ${CELLULAR_EG800Z_SOURCES} )
+    list( APPEND CELLULAR_COMMON_INCLUDE_DIRS ${CELLULAR_EG800Z_INCLUDE_DIRS} )
+endif()
+

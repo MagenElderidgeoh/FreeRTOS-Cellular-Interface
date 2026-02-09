@@ -55,21 +55,12 @@
 typedef struct CellularEG800Z_ModuleContext
 {
     uint32_t moduleInitialized;
-    /* Add module-specific state tracking here */
+    char mqttClientId[ CELLULAR_EG800Z_MAX_MQTT_CLIENTS ][ 64 ];  /* Store client identifiers */
 } CellularEG800Z_ModuleContext_t;
 
 /*-----------------------------------------------------------*/
 
 /* Forward declarations of static functions */
-static CellularPktStatus_t _Cellular_RecvFuncGetMqttStatus( CellularContext_t * pContext,
-                                                            const CellularATCommandResponse_t * pAtResp,
-                                                            void * pData,
-                                                            uint16_t dataLen );
-
-static CellularPktStatus_t _Cellular_RecvFuncGetHttpStatus( CellularContext_t * pContext,
-                                                            const CellularATCommandResponse_t * pAtResp,
-                                                            void * pData,
-                                                            uint16_t dataLen );
 
 /*-----------------------------------------------------------*/
 
@@ -242,6 +233,17 @@ CellularError_t Cellular_EG800Z_MqttOpen( CellularHandle_t cellularHandle,
     }
     else
     {
+        CellularEG800Z_ModuleContext_t * pModuleContext = ( CellularEG800Z_ModuleContext_t * ) pContext->pModuleContext;
+
+        /* Store client identifier for later use */
+        if( pModuleContext != NULL )
+        {
+            ( void ) strncpy( pModuleContext->mqttClientId[ pMqttConfig->clientId ],
+                            pMqttConfig->pClientIdentifier,
+                            sizeof( pModuleContext->mqttClientId[ pMqttConfig->clientId ] ) - 1 );
+            pModuleContext->mqttClientId[ pMqttConfig->clientId ][ sizeof( pModuleContext->mqttClientId[ pMqttConfig->clientId ] ) - 1 ] = '\0';
+        }
+
         /* Configure MQTT parameters - AT+QMTCFG */
         /* Configure SSL context if SSL is enabled */
         if( pMqttConfig->sslContextId != 0xFF )
@@ -310,10 +312,19 @@ CellularError_t Cellular_EG800Z_MqttConnect( CellularHandle_t cellularHandle,
     }
     else
     {
+        CellularEG800Z_ModuleContext_t * pModuleContext = ( CellularEG800Z_ModuleContext_t * ) pContext->pModuleContext;
+        const char * pClientIdentifier = "client_default";
+
+        /* Use stored client identifier if available */
+        if( ( pModuleContext != NULL ) && ( pModuleContext->mqttClientId[ clientId ][ 0 ] != '\0' ) )
+        {
+            pClientIdentifier = pModuleContext->mqttClientId[ clientId ];
+        }
+
         /* Connect to MQTT broker - AT+QMTCONN */
         ( void ) snprintf( cmdBuf, sizeof( cmdBuf ),
-                         "AT+QMTCONN=%u,\"client_%u\"",
-                         clientId, clientId );
+                         "AT+QMTCONN=%u,\"%s\"",
+                         clientId, pClientIdentifier );
 
         atReqConnectMqtt.pAtCmd = cmdBuf;
         atReqConnectMqtt.atCmdType = CELLULAR_AT_NO_RESULT;
@@ -1114,46 +1125,6 @@ CellularError_t Cellular_EG800Z_FileList( CellularHandle_t cellularHandle,
     }
 
     return cellularStatus;
-}
-
-/*-----------------------------------------------------------*/
-
-/* Callback functions for parsing responses */
-
-static CellularPktStatus_t _Cellular_RecvFuncGetMqttStatus( CellularContext_t * pContext,
-                                                            const CellularATCommandResponse_t * pAtResp,
-                                                            void * pData,
-                                                            uint16_t dataLen )
-{
-    /* Implementation for parsing MQTT status responses */
-    CellularPktStatus_t pktStatus = CELLULAR_PKT_STATUS_OK;
-    
-    /* Parse MQTT status from URC or response */
-    ( void ) pContext;
-    ( void ) pAtResp;
-    ( void ) pData;
-    ( void ) dataLen;
-    
-    return pktStatus;
-}
-
-/*-----------------------------------------------------------*/
-
-static CellularPktStatus_t _Cellular_RecvFuncGetHttpStatus( CellularContext_t * pContext,
-                                                            const CellularATCommandResponse_t * pAtResp,
-                                                            void * pData,
-                                                            uint16_t dataLen )
-{
-    /* Implementation for parsing HTTP status responses */
-    CellularPktStatus_t pktStatus = CELLULAR_PKT_STATUS_OK;
-    
-    /* Parse HTTP status from URC or response */
-    ( void ) pContext;
-    ( void ) pAtResp;
-    ( void ) pData;
-    ( void ) dataLen;
-    
-    return pktStatus;
 }
 
 /*-----------------------------------------------------------*/

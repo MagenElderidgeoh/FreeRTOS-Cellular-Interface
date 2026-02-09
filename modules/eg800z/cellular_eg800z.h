@@ -39,8 +39,6 @@
 #endif
 /* *INDENT-ON* */
 
-#include "cellular_config.h"
-#include "cellular_config_defaults.h"
 #include "cellular_types.h"
 
 /*-----------------------------------------------------------*/

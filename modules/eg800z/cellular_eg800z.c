@@ -36,7 +36,9 @@
 #include <stdlib.h>
 
 /* Cellular includes. */
-#include "cellular_config.h"
+#ifndef CELLULAR_DO_NOT_USE_CUSTOM_CONFIG
+    #include "cellular_config.h"
+#endif
 #include "cellular_config_defaults.h"
 #include "cellular_types.h"
 #include "cellular_common.h"

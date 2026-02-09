@@ -13,7 +13,8 @@ set( CELLULAR_COMMON_SOURCES
      ${CMAKE_CURRENT_LIST_DIR}/source/cellular_3gpp_urc_handler.c
      ${CMAKE_CURRENT_LIST_DIR}/source/cellular_3gpp_api.c
      ${CMAKE_CURRENT_LIST_DIR}/source/cellular_pkthandler.c
-     ${CMAKE_CURRENT_LIST_DIR}/source/cellular_pktio.c )
+     ${CMAKE_CURRENT_LIST_DIR}/source/cellular_pktio.c
+     ${CMAKE_CURRENT_LIST_DIR}/source/cellular_mqtt.c )
 
 # Cellular library include directory.
 set( CELLULAR_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/source/include )

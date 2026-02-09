@@ -40,6 +40,7 @@
 #include "cellular_mqtt.h"
 #include "cellular_api.h"
 #include "cellular_common_internal.h"
+#include "cellular_common.h"
 
 /*-----------------------------------------------------------*/
 

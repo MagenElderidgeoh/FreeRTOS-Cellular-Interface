@@ -822,6 +822,112 @@ typedef void ( * CellularSocketDataReadyCallback_t )( CellularSocketHandle_t soc
 typedef void ( * CellularSocketClosedCallback_t )( CellularSocketHandle_t socketHandle,
                                                    void * pCallbackContext );
 
+/*-----------------------------------------------------------*/
+
+/**
+ * @ingroup cellular_datatypes_handles
+ * @brief Opaque HTTP context handle.
+ */
+struct CellularHttpContext;
+typedef struct CellularHttpContext * CellularHttpHandle_t;
+
+/**
+ * @ingroup cellular_datatypes_enums
+ * @brief HTTP request methods.
+ */
+typedef enum CellularHttpMethod
+{
+    CELLULAR_HTTP_METHOD_GET = 0,   /**< HTTP GET method. */
+    CELLULAR_HTTP_METHOD_POST,      /**< HTTP POST method. */
+    CELLULAR_HTTP_METHOD_HEAD,      /**< HTTP HEAD method. */
+    CELLULAR_HTTP_METHOD_PUT,       /**< HTTP PUT method. */
+    CELLULAR_HTTP_METHOD_DELETE     /**< HTTP DELETE method. */
+} CellularHttpMethod_t;
+
+/**
+ * @ingroup cellular_datatypes_enums
+ * @brief HTTP content type.
+ */
+typedef enum CellularHttpContentType
+{
+    CELLULAR_HTTP_CONTENT_TYPE_APPLICATION_X_WWW_FORM_URLENCODED = 0,  /**< application/x-www-form-urlencoded */
+    CELLULAR_HTTP_CONTENT_TYPE_TEXT_PLAIN,                              /**< text/plain */
+    CELLULAR_HTTP_CONTENT_TYPE_APPLICATION_OCTET_STREAM,                /**< application/octet-stream */
+    CELLULAR_HTTP_CONTENT_TYPE_MULTIPART_FORM_DATA,                     /**< multipart/form-data */
+    CELLULAR_HTTP_CONTENT_TYPE_APPLICATION_JSON,                        /**< application/json */
+    CELLULAR_HTTP_CONTENT_TYPE_APPLICATION_XML,                         /**< application/xml */
+    CELLULAR_HTTP_CONTENT_TYPE_TEXT_HTML                                /**< text/html */
+} CellularHttpContentType_t;
+
+/**
+ * @ingroup cellular_datatypes_paramstructs
+ * @brief HTTP configuration parameters.
+ */
+typedef struct CellularHttpConfig
+{
+    uint8_t contextId;                  /**< PDN context ID (1-16). */
+    uint8_t sslCtxId;                   /**< SSL context ID (0 for no SSL, 1-6 for SSL). */
+    uint16_t requestTimeout;            /**< Request timeout in seconds (1-65535). */
+    uint16_t responseTimeout;           /**< Response timeout in seconds (1-65535). */
+    bool enableCustomHeader;            /**< Enable custom HTTP headers. */
+} CellularHttpConfig_t;
+
+/**
+ * @ingroup cellular_datatypes_paramstructs
+ * @brief HTTP request information.
+ */
+typedef struct CellularHttpRequest
+{
+    CellularHttpMethod_t method;         /**< HTTP request method. */
+    const char * pUrl;                   /**< HTTP request URL (NULL terminated string). */
+    uint32_t urlLen;                     /**< Length of URL string. */
+    const char * pData;                  /**< HTTP request body data (can be NULL for GET/HEAD). */
+    uint32_t dataLen;                    /**< Length of request body data. */
+    CellularHttpContentType_t contentType; /**< Content type for POST/PUT requests. */
+    const char * pCustomHeader;          /**< Custom HTTP headers (NULL terminated string, can be NULL). */
+} CellularHttpRequest_t;
+
+/**
+ * @ingroup cellular_datatypes_paramstructs
+ * @brief HTTP response information.
+ */
+typedef struct CellularHttpResponse
+{
+    uint16_t httpStatusCode;             /**< HTTP response status code (e.g., 200, 404). */
+    uint32_t contentLength;              /**< Total content length in bytes. */
+    uint32_t receivedLength;             /**< Received data length in bytes. */
+    const char * pContentType;           /**< Response content type string. */
+} CellularHttpResponse_t;
+
+/**
+ * @ingroup cellular_datatypes_functionpointers
+ * @brief Callback invoked when HTTP data is ready for reading.
+ *
+ * This callback is particularly useful for handling large file downloads
+ * where data needs to be read in chunks.
+ *
+ * @param[in] httpHandle HTTP handle for which data is ready.
+ * @param[in] availableDataLen Length of available data in bytes.
+ * @param[in] pCallbackContext Callback context passed during registration.
+ */
+typedef void ( * CellularHttpDataReadyCallback_t )( CellularHttpHandle_t httpHandle,
+                                                    uint32_t availableDataLen,
+                                                    void * pCallbackContext );
+
+/**
+ * @ingroup cellular_datatypes_functionpointers
+ * @brief Callback invoked when HTTP request is completed.
+ *
+ * @param[in] httpHandle HTTP handle for the completed request.
+ * @param[in] result Result of the HTTP operation.
+ * @param[in] pResponse HTTP response information.
+ * @param[in] pCallbackContext Callback context passed during registration.
+ */
+typedef void ( * CellularHttpRequestCompleteCallback_t )( CellularHttpHandle_t httpHandle,
+                                                          CellularError_t result,
+                                                          const CellularHttpResponse_t * pResponse,
+                                                          void * pCallbackContext );
+
 /* *INDENT-OFF* */
 #ifdef __cplusplus
     }

@@ -588,6 +588,62 @@
     #define LogDebug( message )
 #endif
 
+/**
+ * @brief HTTP request timeout in seconds.<br>
+ *
+ * <b>Possible values:</b>`1 to 65535`<br>
+ * <b>Default value (if undefined):</b> 60
+ */
+#ifndef CELLULAR_CONFIG_HTTP_REQUEST_TIMEOUT_SECONDS
+    #define CELLULAR_CONFIG_HTTP_REQUEST_TIMEOUT_SECONDS    ( 60U )
+#endif
+
+/**
+ * @brief HTTP response timeout in seconds.<br>
+ *
+ * <b>Possible values:</b>`1 to 65535`<br>
+ * <b>Default value (if undefined):</b> 60
+ */
+#ifndef CELLULAR_CONFIG_HTTP_RESPONSE_TIMEOUT_SECONDS
+    #define CELLULAR_CONFIG_HTTP_RESPONSE_TIMEOUT_SECONDS    ( 60U )
+#endif
+
+/**
+ * @brief HTTP read chunk size for large file downloads in bytes.<br>
+ *
+ * This value determines the maximum size of data chunks when reading
+ * large files (MB-level) via HTTP GET. Smaller values use less memory
+ * but require more read operations.
+ *
+ * <b>Possible values:</b>`1024 to 65536`<br>
+ * <b>Default value (if undefined):</b> 65536 (64KB)
+ */
+#ifndef CELLULAR_CONFIG_HTTP_READ_CHUNK_SIZE
+    #define CELLULAR_CONFIG_HTTP_READ_CHUNK_SIZE    ( 65536U )
+#endif
+
+/**
+ * @brief Enable/disable custom HTTP headers support.<br>
+ *
+ * When enabled, allows setting custom HTTP headers for requests.
+ *
+ * <b>Possible values:</b>`0 or 1`<br>
+ * <b>Default value (if undefined):</b> 1 (enabled)
+ */
+#ifndef CELLULAR_CONFIG_HTTP_ENABLE_CUSTOM_HEADERS
+    #define CELLULAR_CONFIG_HTTP_ENABLE_CUSTOM_HEADERS    ( 1U )
+#endif
+
+/**
+ * @brief Maximum number of custom HTTP headers.<br>
+ *
+ * <b>Possible values:</b>`Any positive integer`<br>
+ * <b>Default value (if undefined):</b> 10
+ */
+#ifndef CELLULAR_CONFIG_HTTP_MAX_CUSTOM_HEADERS
+    #define CELLULAR_CONFIG_HTTP_MAX_CUSTOM_HEADERS    ( 10U )
+#endif
+
 /* *INDENT-OFF* */
 #ifdef __cplusplus
     }

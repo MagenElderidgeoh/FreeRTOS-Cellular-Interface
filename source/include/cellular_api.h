@@ -649,6 +649,161 @@ CellularError_t Cellular_SocketRegisterClosedCallback( CellularHandle_t cellular
                                                        CellularSocketClosedCallback_t closedCallback,
                                                        void * pCallbackContext );
 
+/**
+ * @brief Initialize HTTP client context.
+ *
+ * This function initializes an HTTP client context with the specified configuration.
+ * The context must be created before performing any HTTP operations.
+ *
+ * @param[in] cellularHandle The opaque cellular context pointer created by Cellular_Init.
+ * @param[in] pHttpConfig HTTP configuration parameters.
+ * @param[out] pHttpHandle Out parameter to receive the HTTP handle.
+ *
+ * @return CELLULAR_SUCCESS if the operation is successful, otherwise an error
+ * code indicating the cause of the error.
+ */
+CellularError_t Cellular_HttpInit( CellularHandle_t cellularHandle,
+                                   const CellularHttpConfig_t * pHttpConfig,
+                                   CellularHttpHandle_t * pHttpHandle );
+
+/**
+ * @brief Cleanup HTTP client context.
+ *
+ * This function cleans up resources associated with an HTTP client context.
+ *
+ * @param[in] cellularHandle The opaque cellular context pointer created by Cellular_Init.
+ * @param[in] httpHandle HTTP handle returned from Cellular_HttpInit.
+ *
+ * @return CELLULAR_SUCCESS if the operation is successful, otherwise an error
+ * code indicating the cause of the error.
+ */
+CellularError_t Cellular_HttpCleanup( CellularHandle_t cellularHandle,
+                                      CellularHttpHandle_t httpHandle );
+
+/**
+ * @brief Set custom HTTP header.
+ *
+ * This function sets a custom HTTP header for subsequent HTTP requests.
+ * Multiple headers can be set by calling this function multiple times.
+ *
+ * @param[in] cellularHandle The opaque cellular context pointer created by Cellular_Init.
+ * @param[in] httpHandle HTTP handle returned from Cellular_HttpInit.
+ * @param[in] pHeaderName The name of the HTTP header (NULL terminated string).
+ * @param[in] pHeaderValue The value of the HTTP header (NULL terminated string).
+ *
+ * @return CELLULAR_SUCCESS if the operation is successful, otherwise an error
+ * code indicating the cause of the error.
+ */
+CellularError_t Cellular_HttpSetHeader( CellularHandle_t cellularHandle,
+                                        CellularHttpHandle_t httpHandle,
+                                        const char * pHeaderName,
+                                        const char * pHeaderValue );
+
+/**
+ * @brief Perform an HTTP request.
+ *
+ * This function initiates an HTTP request (GET, POST, HEAD, etc.) to the specified URL.
+ * For large file downloads (MB-level), the response data should be read in chunks
+ * using Cellular_HttpReadData to avoid memory issues.
+ *
+ * @param[in] cellularHandle The opaque cellular context pointer created by Cellular_Init.
+ * @param[in] httpHandle HTTP handle returned from Cellular_HttpInit.
+ * @param[in] pRequest HTTP request parameters including method, URL, and data.
+ * @param[out] pResponse HTTP response information including status code and content length.
+ *
+ * @return CELLULAR_SUCCESS if the operation is successful, otherwise an error
+ * code indicating the cause of the error.
+ *
+ * @note For GET requests on large files, after this function returns successfully,
+ * use Cellular_HttpReadData in a loop to read data in chunks.
+ */
+CellularError_t Cellular_HttpRequest( CellularHandle_t cellularHandle,
+                                      CellularHttpHandle_t httpHandle,
+                                      const CellularHttpRequest_t * pRequest,
+                                      CellularHttpResponse_t * pResponse );
+
+/**
+ * @brief Read HTTP response data in chunks.
+ *
+ * This function reads HTTP response data in chunks, which is essential for
+ * handling large files (MB-level) efficiently. It should be called in a loop
+ * after Cellular_HttpRequest until all data is received.
+ *
+ * @param[in] cellularHandle The opaque cellular context pointer created by Cellular_Init.
+ * @param[in] httpHandle HTTP handle returned from Cellular_HttpInit.
+ * @param[out] pBuffer Buffer to receive the HTTP response data.
+ * @param[in] bufferLength Length of the buffer pBuffer.
+ * @param[out] pReceivedDataLength Actual length of data received into the buffer.
+ *
+ * @return CELLULAR_SUCCESS if the operation is successful, otherwise an error
+ * code indicating the cause of the error. Returns CELLULAR_SUCCESS with
+ * pReceivedDataLength set to 0 when all data has been read.
+ *
+ * @note This function is designed to handle large file downloads by reading
+ * data in manageable chunks to avoid memory overflow.
+ */
+CellularError_t Cellular_HttpReadData( CellularHandle_t cellularHandle,
+                                       CellularHttpHandle_t httpHandle,
+                                       uint8_t * pBuffer,
+                                       uint32_t bufferLength,
+                                       uint32_t * pReceivedDataLength );
+
+/**
+ * @brief Register callback for HTTP data ready events.
+ *
+ * This callback is invoked when HTTP response data is available for reading.
+ * It's particularly useful for handling large file downloads asynchronously.
+ *
+ * @param[in] cellularHandle The opaque cellular context pointer created by Cellular_Init.
+ * @param[in] httpHandle HTTP handle returned from Cellular_HttpInit.
+ * @param[in] dataReadyCallback The callback to register. Set to NULL to remove
+ * the existing callback.
+ * @param[in] pCallbackContext The context to be passed to callback function.
+ *
+ * @return CELLULAR_SUCCESS if the operation is successful, otherwise an error
+ * code indicating the cause of the error.
+ */
+CellularError_t Cellular_HttpRegisterDataReadyCallback( CellularHandle_t cellularHandle,
+                                                        CellularHttpHandle_t httpHandle,
+                                                        CellularHttpDataReadyCallback_t dataReadyCallback,
+                                                        void * pCallbackContext );
+
+/**
+ * @brief Register callback for HTTP request completion.
+ *
+ * This callback is invoked when an HTTP request completes (successfully or with error).
+ *
+ * @param[in] cellularHandle The opaque cellular context pointer created by Cellular_Init.
+ * @param[in] httpHandle HTTP handle returned from Cellular_HttpInit.
+ * @param[in] requestCompleteCallback The callback to register. Set to NULL to
+ * remove the existing callback.
+ * @param[in] pCallbackContext The context to be passed to callback function.
+ *
+ * @return CELLULAR_SUCCESS if the operation is successful, otherwise an error
+ * code indicating the cause of the error.
+ */
+CellularError_t Cellular_HttpRegisterRequestCompleteCallback( CellularHandle_t cellularHandle,
+                                                              CellularHttpHandle_t httpHandle,
+                                                              CellularHttpRequestCompleteCallback_t requestCompleteCallback,
+                                                              void * pCallbackContext );
+
+/**
+ * @brief Query the remaining data length to be read.
+ *
+ * This function queries how much HTTP response data is still available to read.
+ * Useful for managing large file downloads.
+ *
+ * @param[in] cellularHandle The opaque cellular context pointer created by Cellular_Init.
+ * @param[in] httpHandle HTTP handle returned from Cellular_HttpInit.
+ * @param[out] pRemainingLength Out parameter to provide the remaining data length in bytes.
+ *
+ * @return CELLULAR_SUCCESS if the operation is successful, otherwise an error
+ * code indicating the cause of the error.
+ */
+CellularError_t Cellular_HttpQueryDataLength( CellularHandle_t cellularHandle,
+                                              CellularHttpHandle_t httpHandle,
+                                              uint32_t * pRemainingLength );
+
 /* *INDENT-OFF* */
 #ifdef __cplusplus
     }
